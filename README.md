@@ -5,6 +5,13 @@
     - 所有的即刻动态相关数据和图片信息
     - 输出到out目录下
 
+# 支持平台
+- MacOs
+- Windows
+
+# 说明
+当前脚本在windows下运行需要关闭chrome应用，用于读取cookies，不然拿不到句柄
+
 # 使用
 在config.json中配置:
 ```

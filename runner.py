@@ -72,7 +72,7 @@ def get_page_node_imgs(json_obj):
     if len(post_nodes) > 0:
         for post_node in post_nodes:
             out_dir = f"out/{name}/pics/"
-            img_name = f"{str(post_node['createdAt']).replace('.','_')}"
+            img_name = f"{str(post_node['createdAt']).replace('.','_').replace(':','_').replace('-','_')}"
             import os
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
