@@ -6,8 +6,8 @@
     - 输出到out目录下
 
 # 支持平台
-- MacOs
-- Windows
+- macOs
+- windows
 
 # 说明
 当前脚本在windows下运行需要关闭chrome应用，用于读取cookies，不然拿不到句柄
