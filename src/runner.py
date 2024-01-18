@@ -1,5 +1,5 @@
 import json
-import jike_utils
+import src.jike_utils as jike_utils
 import time
 
 sql_path = "https://web-api.okjike.com/api/graphql"

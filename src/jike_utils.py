@@ -1,4 +1,3 @@
-
 def start_request(url, cookies,headers):
     import requests
     response = requests.post(url, cookies=cookies, headers=headers)
