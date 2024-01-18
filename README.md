@@ -11,10 +11,12 @@
 在config.json中配置目标用户id，在网页版即刻的主页中拿取，记得运行脚本之前在chrome浏览器中登录一次网页版即刻，后续将会自动获取cookie并拉取，无需额外配置
 
 依赖:
+
 ```
 browser_cookie3
 
 ```
+然后运行：
 
 ```
 python3 main.py
