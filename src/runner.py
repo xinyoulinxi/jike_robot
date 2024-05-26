@@ -10,6 +10,7 @@ cur_page_count = 1  # 当前页数
 loop_count = -1  # 循环次数
 pic_list = [] # 图片列表
 total_image_count = 0 # 图片总数
+user_name = ""
 config_data = {
     "user_name":"",
     "loop_count":-1, # -1 代表一直获取直到没有下一页
@@ -71,13 +72,9 @@ def get_page_node_imgs(json_obj):
     # download images
     if len(post_nodes) > 0:
         for post_node in post_nodes:
-            out_dir = f"out/{name}/pics/"
-            img_name = f"{str(post_node['createdAt']).replace('.','_').replace(':','_').replace('-','_')}"
-            import os
-            if not os.path.exists(out_dir):
-                os.makedirs(out_dir)
+            img_path = jike_utils.get_image_path(post_node,name)
             pic_node = post_node["pictures"]
-            thread = threading.Thread(target=jike_utils.save_images_async, args=(pic_node, out_dir, img_name))
+            thread = threading.Thread(target=jike_utils.save_images_async, args=(pic_node, img_path))
             thread.start()
             threads.append(thread)
             post_img_count = len(jike_utils.get_images_url_list(pic_node))
@@ -135,14 +132,16 @@ def get_first_page():
         time.sleep(1)
 
 def start_loop():
-    global has_next,loop_count
+    global has_next,loop_count,user_name
     while has_next and loop_count != 0 :
         response = jike_utils.get_page_data(sql_path,cookies,headers,query_data)
         sql_response_json_content = response.text
         json_obj = json.loads(sql_response_json_content)
         loop_thing(sql_response_json_content,json_obj)
+        user_name = jike_utils.get_display_name(json_obj)
         loop_count -= 1
         time.sleep(1)
+    
 
 def get_config():
     global variables,loop_count,config_data
@@ -154,11 +153,28 @@ def get_config():
     # loop_count = int(input("input loop count( -1 define get all page):"))
     loop_count = config_data["loop_count"]
 
+def out_put_info(name):
+    import os
+    md_content = jike_utils.read_file_content(os.path.join("out",name,"all_post.md"))
+    table_header = "| 分享总数 | 转发总数 | 评论总数 | 点赞总数 | \n"
+    table_header += "|---------|----------|-----------|--------|\n"
+    md_content = table_header + f"| {jike_utils.all_share_count} | {jike_utils.all_repost_count} | {jike_utils.all_comment_count} | {jike_utils.all_like_count} | \n\n"+md_content
+    jike_utils.write_content_to_file(md_content,os.path.join("out",name,"all_post.md"))
+    print("all_comment_count",jike_utils.all_comment_count,"all_like_count",jike_utils.all_like_count,"all_image_count",jike_utils.all_image_count,"total_post_count",total_post_count,"total_image_count",total_image_count)
+
+def convert_markdown_to_html(name):
+    import os,markdown
+    md_content = jike_utils.read_file_content(os.path.join("out",name,"all_post.md"))
+    # 将Markdown内容转换为HTML
+    html_content = markdown.markdown(md_content, extensions=['tables', 'fenced_code'])
+    jike_utils.write_content_to_file(html_content,os.path.join("out",name,"all_post.html"))
 def run():
     get_config()
     update_status()
     get_first_page()
     start_loop()
+    out_put_info(user_name)
+    convert_markdown_to_html(user_name)
 
 if __name__ == '__main__':
     run()
