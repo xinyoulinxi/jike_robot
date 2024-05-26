@@ -93,7 +93,7 @@ def generate_clund_image(out_dir,file_name):
             output_file.write(f"{index}\n{item}" + '\n\n')
             index+=1
 
-    print(f"提取的内容已经写入到 {output_file_path} 中。")
+    print(f"content have output to {output_file_path}.")
     
     content_list = [item["content"] for item in filter_list]
     # print(content_list)

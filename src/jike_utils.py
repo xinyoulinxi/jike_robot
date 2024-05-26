@@ -5,10 +5,10 @@ def start_request(url, cookies,headers):
     
     # 检查请求是否成功
     if response.status_code == 200:
-        print("请求成功！")
+        print("request success!")
         html_content = response.text
     else:
-        print(f"请求失败，状态码：{response.status_code}")
+        print(f"request error, code: {response.status_code}")
     return html_content
 
 def get_all_item(html_content):
@@ -50,7 +50,7 @@ def get_all_item(html_content):
     out_content = ""
     for match in matches:
         out_content += match + "\n\n"
-        print(f"已保存到文件：{output_file}")
+        print(f"have save into {output_file}")
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(f"size = {len(matches)}\n\n{out_content}")
 
@@ -65,7 +65,7 @@ def save_data_to_file(data,output_dir = "out",file_name='web_content.txt',mode="
     with open(output_file, mode, encoding='utf-8') as f:
         f.write(data)
 
-    print(f"内容已保存到文件：{output_file} mode = {mode}")
+    print(f"content have output into {output_file}, mode = {mode}")
 
 def erase_space_content(content):
     content = content.replace(" ","")
@@ -205,8 +205,8 @@ def get_page_data(path,cookies,headers,data):
     import requests
     import json
     response = requests.post(path, cookies=cookies, headers=headers, data=json.dumps(data))
+    # 检查请求是否成功
     if response.status_code == 200:
-        print("请求成功！")
+        print("request success!")
     else:
-        print(f"请求失败，状态码：{response.status_code}")
-    return response
+        print(f"request error, code: {response.status_code}")
