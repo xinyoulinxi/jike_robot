@@ -121,6 +121,8 @@ def convert_cookiejar_to_requests_cookies(cookie_jar) -> dict:
 
 def get_nodes_node(response_json):
     return response_json["data"]["userProfile"]["feeds"]["nodes"]
+def get_avatar_url(post_node):
+    return post_node["user"]["avatarImage"]["picUrl"]
 
 def get_display_name(response_json):
     post_nodes = response_json["data"]["userProfile"]["feeds"]["nodes"]
@@ -209,7 +211,7 @@ def get_imgs_md_content(post_node):
 def convert_to_normal_time(time_str):
     from datetime import datetime
     datetime_obj = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-    normal_time_str = datetime_obj.strftime("%Y-%m-%d %H:%M:%S")
+    normal_time_str = datetime_obj.strftime("%Y年%m月%d日 %H:%M:%S")
     return normal_time_str
 
 def get_post_type(type):
@@ -282,7 +284,12 @@ def download_image(url, save_path):
             print(f"download image from success~~ path = {save_path},remind count = {pic_process_count}")
     else:
         print(f"Failed to download image from {url}, status code: {response.status_code}")
-        
+
+def get_avatar_save_path(name):
+    import os
+    save_path = os.path.join("out",name,"pics","avatar.jpg")
+    return save_path
+    
 def get_page_data(path,cookies,headers,data):
     import requests
     import json

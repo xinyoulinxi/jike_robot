@@ -116,10 +116,17 @@ def loop_thing(sql_response_json_content,json_obj,is_first_page=False):
 
 
 def get_first_page():
+    import os
+    global user_name
     response = jike_utils.get_page_data(sql_path,cookies,headers,query_data)
     sql_response_json_content = response.text
     json_obj = json.loads(sql_response_json_content)
+    user_name = jike_utils.get_display_name(json_obj)
+    print(f"start get first page for {user_name}")
     post_nodes = jike_utils.get_nodes_node(json_obj)
+    # init env
+    jike_utils.ensure_dir_exists(os.path.join("out",user_name))
+    jike_utils.ensure_dir_exists(os.path.join("out",user_name,"pics"))
     print(f"len = {len(post_nodes)}")
     if len(post_nodes) > 0:
         all_post_text = ""
@@ -127,7 +134,8 @@ def get_first_page():
         all_post_text += "username: "+str(post_nodes[0]["user"]["username"])+"\n"
         all_post_text += "briefIntro: "+str(post_nodes[0]["user"]["briefIntro"])+"\n"
         all_post_text += "avatarImage: "+str(post_nodes[0]["user"]["avatarImage"])+"\n" 
-        all_post_text += "~~~~~~~post below:\n\n"   
+        all_post_text += "~~~~~~~post below:\n\n"
+        jike_utils.download_image(jike_utils.get_avatar_url(post_nodes[0]),jike_utils.get_avatar_save_path(user_name))
         loop_thing(sql_response_json_content,json_obj,is_first_page = True)
         time.sleep(1)
 
@@ -138,7 +146,6 @@ def start_loop():
         sql_response_json_content = response.text
         json_obj = json.loads(sql_response_json_content)
         loop_thing(sql_response_json_content,json_obj)
-        user_name = jike_utils.get_display_name(json_obj)
         loop_count -= 1
         time.sleep(1)
     
@@ -155,10 +162,15 @@ def get_config():
 
 def out_put_info(name):
     import os
+    global total_post_count
+    print(name)
     md_content = jike_utils.read_file_content(os.path.join("out",name,"all_post.md"))
-    table_header = "| 分享总数 | 转发总数 | 评论总数 | 点赞总数 | \n"
-    table_header += "|---------|----------|-----------|--------|\n"
-    md_content = table_header + f"| {jike_utils.all_share_count} | {jike_utils.all_repost_count} | {jike_utils.all_comment_count} | {jike_utils.all_like_count} | \n\n"+md_content
+    table_header = "| 发帖总数 | 被分享数 | 被转发数 | 被评论数 | 被点赞数 | \n"
+    table_header += "|---------|---------|----------|-----------|--------|\n"
+    md_content = table_header + f"| {total_post_count} | {jike_utils.all_share_count} | {jike_utils.all_repost_count} | {jike_utils.all_comment_count} | {jike_utils.all_like_count} | \n\n"+md_content
+    
+    md_content = f"# {name} 的即刻动态\n\n"+md_content
+    md_content = f"![Image]({os.path.join('pics','avatar.jpg')})\n\n"+md_content
     jike_utils.write_content_to_file(md_content,os.path.join("out",name,"all_post.md"))
     print("all_comment_count",jike_utils.all_comment_count,"all_like_count",jike_utils.all_like_count,"all_image_count",jike_utils.all_image_count,"total_post_count",total_post_count,"total_image_count",total_image_count)
 
@@ -169,6 +181,7 @@ def convert_markdown_to_html(name):
     html_content = markdown.markdown(md_content, extensions=['tables', 'fenced_code'])
     jike_utils.write_content_to_file(html_content,os.path.join("out",name,"all_post.html"))
 def run():
+    global loop_count,user_name
     get_config()
     update_status()
     get_first_page()
